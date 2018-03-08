@@ -7,7 +7,12 @@ As this is an experiment I strongly encourage you to not use this code in produc
 Other than that, feel free to copy, modify and use this code.
 
 ## Getting started
-Check out the wiki pages to get started.
+Follow these steps to get started with this code:
+
+ * `git clone https://github.com/wmeints/gadget --recursive`
+ * `dotnet build Gadget.sln`
+
+To run tests please execute `dotnet test`
 
 ## License
 This code is licensed under the MIT license.
