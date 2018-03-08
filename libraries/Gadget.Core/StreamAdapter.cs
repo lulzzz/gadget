@@ -4,6 +4,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Akka.Actor;
+using Akka.Streams;
+using Akka.Streams.Dsl;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
@@ -15,15 +18,22 @@ namespace Gadget.Core
     /// </summary>
     public class StreamAdapter : IStreamAdapter
     {
-        private readonly ICredentialProvider credentialProvider;
+        private readonly ICredentialProvider _credentialProvider;
+        private readonly IDialogFlowProvider _dialogFlowProvider;
+        private readonly IBotAdapter _botAdapter;
+        private readonly ActorSystem _actorSystem;
 
         /// <summary>
         /// Initializes a new instance of <see cref="StreamAdapter"/>
         /// </summary>
         /// <param name="credentialProvider">Credential provider to use</param>
-        public StreamAdapter(ICredentialProvider credentialProvider)
+        public StreamAdapter(ICredentialProvider credentialProvider, IBotAdapter botAdapter, IDialogFlowProvider dialogFlowProvider)
         {
-            this.credentialProvider = credentialProvider;
+            _credentialProvider = credentialProvider;
+            _dialogFlowProvider = dialogFlowProvider;
+            _botAdapter = botAdapter;
+
+            _actorSystem = ActorSystem.Create($"gadgetbot-{Guid.NewGuid()}");
         }
         
         /// <summary>
@@ -35,15 +45,30 @@ namespace Gadget.Core
         public async Task ProcessActivity(ClaimsIdentity identity, Activity activity)
         {
             var credentials = await GetAppCredentials(identity);
-            var botConnectorClient = new ConnectorClient(new Uri(activity.ServiceUrl, UriKind.RelativeOrAbsolute), credentials);
+            
+            // The sink for our stream is the bot connector client sink.
+            var activitySink = Sink.ForEach((IEnumerable<IActivity> replies) =>
+            {
+                _botAdapter.SendActivity(activity.ServiceUrl,credentials, replies);
+            });
 
-            //TODO: Pass the activity through the stream and send the results to the bot connector client
+            // The dialog flow is provided through an external provider.
+            // We don't know what this part of the stream looks like, just that we want a single
+            // activity as input and a series of activities as output.
+            var dialogFlow = _dialogFlowProvider.GetDialogFlow();
+
+            var activityStream = Source.Single((IActivity)activity).Via(dialogFlow).To(activitySink);
+
+            using(var materializer = _actorSystem.Materializer())
+            {
+                activityStream.Run(materializer);
+            }
         }
 
         private async Task<MicrosoftAppCredentials> GetAppCredentials(ClaimsIdentity identity)
         {
             var appId = GetBotIdentifierClaim(identity)?.Value;
-            var appPassword = await credentialProvider.GetAppPasswordAsync(appId);
+            var appPassword = await _credentialProvider.GetAppPasswordAsync(appId);
 
             var appCredentials = new MicrosoftAppCredentials(appId, appPassword);
 
