@@ -1,0 +1,3 @@
+[submodule "external/botbuilder-dotnet"]
+	path = external/botbuilder-dotnet
+	url = https://github.com/Microsoft/botbuilder-dotnet.git

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\external\botbuilder-dotnet\libraries\Microsoft.Bot.Connector\Microsoft.Bot.Connector.csproj" />
+    <ProjectReference Include="..\..\external\botbuilder-dotnet\libraries\Microsoft.Bot.Schema\Microsoft.Bot.Schema.csproj" />
+  </ItemGroup>
+
+</Project>
