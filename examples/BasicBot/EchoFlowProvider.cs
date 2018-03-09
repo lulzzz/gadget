@@ -13,18 +13,11 @@ namespace BasicBot
     {
         public Flow<IActivity, IEnumerable<IActivity>, NotUsed> GetDialogFlow()
         {
-            return Flow.FromFunction<IActivity, IEnumerable<IActivity>>(activity =>
-            {
-                if (activity.Type == ActivityTypes.Message)
-                {
-                    return new[]
-                    {
-                        ((Activity)activity).CreateReply(activity.AsMessageActivity().Text)
-                    };
-                }
-
-                return new Activity[] { };
-            });
+            return Flow.Create<IActivity>()
+                .Where(activity => activity.Type == ActivityTypes.Message)
+                .Select(activity => (Activity)activity)
+                .Select(activity => new IActivity[] { activity.CreateReply(activity.Text) })
+                .Select(activities => (IEnumerable<IActivity>)activities);
         }
     }
 }

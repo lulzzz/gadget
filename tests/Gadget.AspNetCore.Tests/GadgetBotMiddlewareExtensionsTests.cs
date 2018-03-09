@@ -17,7 +17,7 @@ namespace Gadget.AspNetCore.Tests
             var serviceProvider = A.Fake<IServiceProvider>();
             var appBuilder = new ApplicationBuilder(serviceProvider);
 
-            appBuilder.UseGadgetBot(new GadgetBotMiddlewareOptions(A.Fake<ICredentialProvider>()));
+            appBuilder.UseGadgetBot();
 
 
         }

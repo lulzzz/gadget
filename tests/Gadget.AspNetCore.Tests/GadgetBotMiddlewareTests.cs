@@ -26,7 +26,7 @@ namespace Gadget.AspNetCore.Tests
             context.Request.Path = "/api/messages";
             context.Request.Method = "POST";
 
-            var middleware = new GadgetBotMiddleware(new GadgetBotMiddlewareOptions(credentialProvider), streamAdapter, (httpContext) =>
+            var middleware = new GadgetBotMiddleware(credentialProvider, streamAdapter, (httpContext) =>
             {
                 return Task.CompletedTask;
             });

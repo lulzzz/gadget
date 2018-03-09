@@ -18,18 +18,18 @@ namespace Gadget.AspNetCore
     /// </summary>
     public class GadgetBotMiddleware
     {
-        private GadgetBotMiddlewareOptions _options;
-        private IStreamAdapter _streamAdapter;
-        private RequestDelegate _next;
+        private readonly ICredentialProvider _credentialProvider;
+        private readonly IStreamAdapter _streamAdapter;
+        private readonly RequestDelegate _next;
 
         /// <summary>
         /// Initializes a new instance of <see cref="GadgetBotMiddleware"/>
         /// </summary>
         /// <param name="options"></param>
-        public GadgetBotMiddleware(GadgetBotMiddlewareOptions options, IStreamAdapter streamAdapter, RequestDelegate next)
+        public GadgetBotMiddleware(ICredentialProvider credentialProvider, IStreamAdapter streamAdapter, RequestDelegate next)
         {
-            _options = options;
             _next = next;
+            _credentialProvider = credentialProvider;
             _streamAdapter = streamAdapter;
         }
 
@@ -47,7 +47,7 @@ namespace Gadget.AspNetCore
                 var activity = DeserializeBody(context.Request);
 
                 var credentials = await JwtTokenValidation.AuthenticateRequest(
-                    activity, authorizationHeader, _options.CredentialProvider);
+                    activity, authorizationHeader, _credentialProvider);
 
                 await _streamAdapter.ProcessActivity(credentials, activity);
 

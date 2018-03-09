@@ -42,7 +42,7 @@ namespace BasicBot
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseGadgetBot(new GadgetBotMiddlewareOptions(new ConfigurationCredentialProvider(Configuration)));
+            app.UseGadgetBot();
         }
     }
 }

@@ -7,9 +7,9 @@ namespace Gadget.AspNetCore
 {
     public static class GadgetBotMiddlewareExtensions
     {
-        public static IApplicationBuilder UseGadgetBot(this IApplicationBuilder app, GadgetBotMiddlewareOptions options)
+        public static IApplicationBuilder UseGadgetBot(this IApplicationBuilder app)
         { 
-            app.UseMiddleware<GadgetBotMiddleware>(options);
+            app.UseMiddleware<GadgetBotMiddleware>();
             return app;    
         }
     }
