@@ -61,7 +61,7 @@ namespace Gadget.AspNetCore
         {
             services.AddSingleton<IDialogFlowProvider, TDialogFlowProvider>();
             services.AddSingleton<IBotAdapter, BotAdapter>();
-            services.AddSingleton<IStreamAdapter>();
+            services.AddSingleton<IStreamAdapter, StreamAdapter>();
 
             return new GadgetBotBuilder(services);
         }
