@@ -41,16 +41,21 @@ namespace Gadget.AspNetCore
         /// <returns></returns>
         public async Task InvokeAsync(HttpContext context)
         {
-            var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-            var activity = DeserializeBody(context.Request);
+            if (context.Request.Path.StartsWithSegments("/api/messages") && context.Request.Method == "POST")
+            {
+                var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+                var activity = DeserializeBody(context.Request);
 
-            var credentials = await JwtTokenValidation.AuthenticateRequest(
-                activity, authorizationHeader, _options.CredentialProvider);
+                var credentials = await JwtTokenValidation.AuthenticateRequest(
+                    activity, authorizationHeader, _options.CredentialProvider);
 
-            await _streamAdapter.ProcessActivity(credentials, activity);
+                await _streamAdapter.ProcessActivity(credentials, activity);
 
-            context.Response.ContentLength = 0;
-            context.Response.StatusCode = 202;
+                context.Response.ContentLength = 0;
+                context.Response.StatusCode = 202;
+
+                return;
+            }
 
             await _next(context);
         }

@@ -23,7 +23,11 @@ namespace Gadget.AspNetCore.Tests
 
             A.CallTo(() => credentialProvider.IsAuthenticationDisabledAsync()).Returns(true);
 
-            var middleware = new GadgetBotMiddleware(new GadgetBotMiddlewareOptions(credentialProvider), streamAdapter, (httpContext) => {
+            context.Request.Path = "/api/messages";
+            context.Request.Method = "POST";
+
+            var middleware = new GadgetBotMiddleware(new GadgetBotMiddlewareOptions(credentialProvider), streamAdapter, (httpContext) =>
+            {
                 return Task.CompletedTask;
             });
 
